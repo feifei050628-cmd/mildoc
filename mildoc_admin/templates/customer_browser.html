@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}活跃客户 - MilDoc 管理后台{% endblock %}
+
+{% block content %}
+<div class="customer-browser" data-conversation-url="{{ url_for('conversation_browser') | e }}">
+    <div class="customer-browser-header">
+        <h2 class="customer-title">活跃客户</h2>
+        <p class="customer-desc">最近 100 个活跃客户，点击某条记录可查看该客户的对话</p>
+    </div>
+
+    <div class="customer-list-wrap">
+        {% if customers %}
+        <table class="customer-table">
+            <thead>
+                <tr>
+                    <th class="col-avatar">头像</th>
+                    <th class="col-name">名称（昵称）</th>
+                    <th class="col-id">用户 ID</th>
+                    <th class="col-time">活跃时间</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in customers %}
+                <tr class="customer-row" data-external-userid="{{ c.external_userid | e }}" role="button" tabindex="0">
+                    <td class="col-avatar">
+                        {% if c.avatar %}
+                        <img src="{{ c.avatar }}" alt="" class="customer-avatar" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
+                        <span class="customer-avatar-placeholder" style="display: none;">—</span>
+                        {% else %}
+                        <span class="customer-avatar-placeholder">—</span>
+                        {% endif %}
+                    </td>
+                    <td class="col-name">{{ c.name or '—' }}</td>
+                    <td class="col-id"><code>{{ c.external_userid }}</code></td>
+                    <td class="col-time">{{ c.updated_at.strftime('%Y-%m-%d %H:%M') if c.updated_at else '—' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="customer-empty">暂无活跃客户数据</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function() {
+    var baseUrl = document.querySelector('.customer-browser').getAttribute('data-conversation-url');
+    document.querySelectorAll('.customer-row').forEach(function(row) {
+        row.addEventListener('click', function() {
+            var id = this.getAttribute('data-external-userid');
+            if (id) window.location.href = baseUrl + '?external_userid=' + encodeURIComponent(id);
+        });
+        row.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                row.click();
+            }
+        });
+    });
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}对话浏览 - Mildoc 管理后台{% endblock %}
+
+{% block content %}
+<div class="conversation-browser">
+    <div class="conversation-browser-header">
+        <h2 class="conversation-title">对话浏览</h2>
+        <div class="conversation-filters" style="display: none;">
+            <div class="filter-group">
+                <label for="filter-external-userid" class="filter-label">外部用户 ID</label>
+                <input type="text" id="filter-external-userid" class="form-input filter-input" placeholder="可选，留空显示全部">
+            </div>
+            <div class="filter-group">
+                <label for="filter-limit" class="filter-label">每页条数</label>
+                <select id="filter-limit" class="form-input filter-input">
+                    <option value="10">10</option>
+                    <option value="20" selected>20</option>
+                    <option value="50">50</option>
+                </select>
+            </div>
+            <button id="btn-query" class="btn btn-primary">查询</button>
+        </div>
+    </div>
+
+    <div id="conversation-list" class="conversation-list">
+        <div class="loading">加载中...</div>
+    </div>
+
+    <div id="load-more-wrap" class="load-more-wrap" style="display: none;">
+        <button id="btn-load-more" class="btn btn-secondary">加载更多</button>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/conversation_browser.js') }}"></script>
+{% endblock %}
