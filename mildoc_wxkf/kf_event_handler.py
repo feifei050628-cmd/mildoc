@@ -2,7 +2,7 @@ import time
 import signal
 from typing import Dict
 from wecom_api import wecom_api
-from cursor_manager import get_cursor_and_token, save_cursor
+from cursor_manager import get_cursor_and_token, save_cursor, get_latest_kfid
 from conversation_manager import message_insert, message_exists
 from kf_customer_event_handler import handle_customer_event
 from kf_system_event_handler import handle_system_event
@@ -29,10 +29,7 @@ def _setup_signal_handlers():
     signal.signal(signal.SIGINT, _handle_shutdown_signal)
 
 
-WECOM_KF_ID=os.getenv('WECOM_KF_ID')
-
-
-_last_kf_token = ""
+_last_kf_tokens: dict[str, str] = {}
 
 def kf_event_handler() -> None:
     """
@@ -40,20 +37,19 @@ def kf_event_handler() -> None:
     """
     try:
 
-        global _last_kf_token
         
         # 从持久化存储获取该客服账号的最后cursor和token
-        open_kfid = WECOM_KF_ID
+        open_kfid = get_latest_kfid()
         next_cursor, token = get_cursor_and_token(open_kfid)
         has_more = 1
         limit = 100
 
-        if token == _last_kf_token:
+        if open_kfid in _last_kf_tokens and _last_kf_tokens[open_kfid] == token:
             logger.debug(f"token未变化，跳过拉取客服消息 - OpenKfId: {open_kfid}")
             return
         
 
-        _last_kf_token = token
+        _last_kf_tokens[open_kfid] = token
 
         #来自企业微信的接口文档：
         #是否还有更多数据。0-否；1-是。

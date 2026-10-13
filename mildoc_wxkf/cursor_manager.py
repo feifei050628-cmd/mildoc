@@ -2,6 +2,30 @@ from loguru import logger
 from typing import Tuple
 from connection_manager import get_connection
 
+def get_latest_kfid() -> str:
+    """
+    获取最近变更的kfid（有消息通知会更新 update_at 字段）
+
+    Returns:
+        kfid 字符串，不存在时为空字符串。
+    """
+    try:
+        with get_connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(
+                    'SELECT `open_kfid` FROM wxkf_cursors order by updated_at desc limit 1'
+                )
+                result = cursor.fetchone()
+                if result:
+                    return result['open_kfid']
+                else:
+                    return ""
+                    
+    except Exception as e:
+        logger.error(f"获取微信客服 ID 失败: {e}")
+        return ""
+
+
 def get_cursor_and_token(open_kfid: str) -> Tuple[str, str]:
     """
     获取指定客服账号的微信客服同步游标
