@@ -4,9 +4,11 @@ import os
 import sys
 import json
 
-_HERE = os.path.dirname(os.path.abspath(__file__))          # mildoc_index
+_HERE = os.path.dirname(os.path.abspath(__file__))          # tests/
 _ROOT = os.path.dirname(_HERE)                               # 项目根
-for _p in (_HERE, os.path.join(_ROOT, "mildoc_wxkf"), os.path.join(_ROOT, "mildoc_admin")):
+for _p in (os.path.join(_ROOT, "mildoc_index"),
+           os.path.join(_ROOT, "mildoc_wxkf"),
+           os.path.join(_ROOT, "mildoc_admin")):
     if _p not in sys.path:
         sys.path.insert(0, _p)
 from dotenv import load_dotenv
